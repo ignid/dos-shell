@@ -1,13 +1,6 @@
 int echo_status = 1;
 
-#ifdef _WIN32
-char* path_name = "C:\\";
-char* actual_path_name = "C:\\";
-#elif defined __linux__
-char* path_name = "C:\\";
-char* actual_path_name = "/";
-#endif
-
+// STRING MANIPULATION FUNCTIONS
 char* left_space (char* string, size_t max) {
 	size_t string_len = strlen(string);
 	size_t space_len = max - string_len;
@@ -19,4 +12,19 @@ char* left_space (char* string, size_t max) {
 	strcat(spaced, string);
 	spaced[max + 1] = '\0';
 	return spaced;
+}
+
+// NUMBER TO STRING FUNCTIONS
+char* itoa(int i) {
+	size_t length = snprintf( NULL, 0, "%d", i );
+	char* str = malloc(sizeof(char) * (length + 1));
+	snprintf( str, length + 1, "%d", i );
+	return str;
+}
+
+char* ltoa(long i) {
+	size_t length = snprintf( NULL, 0, "%lu", i );
+	char* str = malloc(sizeof(char) * (length + 1));
+	snprintf( str, length + 1, "%lu", i );
+	return str;
 }

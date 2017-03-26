@@ -5,7 +5,7 @@
 #include <sys/utsname.h>
 #endif
 
-void cmd_execute(void* terminal, void* self, char* arguments) {
+void cmd_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	#ifdef _WIN32
 	#elif defined __linux__
 	struct utsname os_stat;
@@ -15,49 +15,25 @@ void cmd_execute(void* terminal, void* self, char* arguments) {
 	#endif
 	
 	char* line;
-	char* command;
-	char* args;
-	size_t command_length, length;
+	size_t length;
 	char character;
 	
 	while(1) {
 		line = calloc(1, sizeof(char));
-		command = NULL;
-		args = NULL;
-		command_length = 0;
 		length = 0;
+		character = NULL;
 		
 		if(echo_status) {
-			printf("\nC:\\> ");
+			printf("\n%s> ", Path_to_string(terminal->first_path));
 		}
 		while((character = getchar()) != '\n') {
 			line = realloc(line, sizeof(char)*(length+1));
 			line[length] = character;
 			length++;
-			if(isspace(character) && !command_length) {
-				command = malloc(sizeof(char) * length);
-				command_length = length;
-				strncpy(command, line, length);
-			}
 		}
 		
-		if(!command_length) {
-			command = calloc(length, sizeof(char));
-			command_length = length;
-			strncpy(command, line, length);
-		}
-		
-		if(length != command_length) {
-			args = malloc(sizeof(char) * (length));
-			strncpy(args, line + command_length, length);
-			Terminal_execute_command((Terminal*)terminal, command, args, command_length - 1);
-			
-			free(args);
-		} else {
-			Terminal_execute_command((Terminal*)terminal, command, "", length);
-		}
+		Terminal_execute_command(terminal, line);
 		
 		free(line);
-		free(command);
 	}
 }

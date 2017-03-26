@@ -3,16 +3,10 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #endif
 
-char* itoa(int i) {
-	size_t length = snprintf( NULL, 0, "%d", i );
-	char* str = malloc(sizeof(char) * (length + 1));
-	snprintf( str, length + 1, "%d", i );
-	return str;
-}
-
-void dir_execute(void* terminal, void* self, char* arguments) {
+void dir_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	#ifdef _WIN32
 	#elif defined __linux__
 	printf(" Volume in drive ? is ?\n");
@@ -20,7 +14,7 @@ void dir_execute(void* terminal, void* self, char* arguments) {
 	printf("\n");
 	printf(" Directory of F:\\\n");
 	
-	DIR* dir = opendir("/");
+	DIR* dir = opendir(Path_to_string(terminal->first_path));
 	struct dirent* dp;
 	struct stat file_stat;
 	
@@ -57,9 +51,13 @@ void dir_execute(void* terminal, void* self, char* arguments) {
 		}
 	}
 	
+	struct statvfs fs_stat;
+	statvfs("/", &fs_stat);
+	long free_size = fs_stat.f_bavail * fs_stat.f_bfree;
+	
 	//               7
 	//     5,623,325
 	printf("%s File(s) %s bytes\n", left_space(itoa(files), 16), left_space(itoa(total_size), 14));
-	printf("%s  Dir(s) %s bytes free\n", left_space(itoa(directories), 16), left_space(itoa(total_size), 14));
+	printf("%s  Dir(s) %s bytes free\n", left_space(itoa(directories), 16), left_space(ltoa(free_size), 14));
 	#endif
 }

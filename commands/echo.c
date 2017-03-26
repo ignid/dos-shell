@@ -1,4 +1,4 @@
-void echo_execute(void* terminal, void* self, char* arguments) {
+void echo_execute(struct Terminal* terminal,struct Command* self, char* arguments) {
 	if(strcmp(arguments, "on") == 0) {
 		printf("ECHO is on.\n");
 		echo_status = 1;
@@ -8,5 +8,5 @@ void echo_execute(void* terminal, void* self, char* arguments) {
 		return;
 	}
 	
-	printf("%s", arguments);
+	printf("%s\n", arguments);
 }
