@@ -19,7 +19,7 @@ void cmd_execute(struct Terminal* terminal, struct Command* self, char* argument
 	char character;
 	
 	while(1) {
-		line = calloc(1, sizeof(char));
+		line = calloc(1, 1);
 		length = 0;
 		character = NULL;
 		
@@ -27,7 +27,7 @@ void cmd_execute(struct Terminal* terminal, struct Command* self, char* argument
 			printf("\n%s> ", Path_to_string(terminal->first_path));
 		}
 		while((character = getchar()) != '\n') {
-			line = realloc(line, sizeof(char)*(length+1));
+			line = realloc(line, length+1);
 			line[length] = character;
 			length++;
 		}

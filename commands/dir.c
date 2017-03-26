@@ -14,7 +14,7 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	printf("\n");
 	printf(" Directory of F:\\\n");
 	
-	DIR* dir = opendir(Path_to_string(terminal->first_path));
+	DIR* dir = opendir(Terminal_get_path(terminal));
 	struct dirent* dp;
 	struct stat file_stat;
 	
@@ -26,8 +26,8 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	while((dp = readdir(dir)) != NULL) {
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")) {
 		} else {
-			char absolute_path[strlen(dp->d_name) + 1];
-			strcpy(absolute_path, "/");
+			char absolute_path[strlen(dp->d_name) + strlen(Terminal_get_path(terminal))];
+			strcpy(absolute_path, Terminal_get_path(terminal));
 			strcat(absolute_path, dp->d_name);
 			
 			if(stat(absolute_path, &file_stat) != 0) {

@@ -13,16 +13,22 @@ void Path_destroy(Path* self) {
 }
 
 char* Path_to_string(Path* self) {
-	char* string = malloc(strlen(self->name) * sizeof(char));
-	strcpy(string, self->name);
+	size_t length = strlen(self->name);
+	Path* current = self->next;
+	while(current != NULL) {
+		length += strlen(current->name) + 1;
+		current = current->next;
+	}
 	
-	Path* current = self;
+	char* string = malloc(length);
+	strcpy(string, self->name);
+	current = self;
 	while(current->next != NULL) {
 		current = current->next;
-		string = realloc(string, (strlen(current->name)+1)*sizeof(char));
 		strcat(string, current->name);
 		strcat(string, "/");
 	}
+	string[length] = '\0';
 	
 	return string;
 }

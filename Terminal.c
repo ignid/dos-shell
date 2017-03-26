@@ -40,10 +40,12 @@ int Terminal_add_command(Terminal* self, Command* command) {
 }
 
 void Terminal_execute_command(Terminal* self, char* line) {
-	char* command = strtok(strdup(line), " ");
+	char* running = strdup(line);
+	char* command = strsep(&running, " ");
+	if(strcmp(command, "") == 0) return;
 	
 	size_t length = strlen(line) - strlen(command);
-	char* arguments = malloc(sizeof(char) * length);
+	char* arguments = malloc(length);
 	strncpy(arguments, line + strlen(command) + 1, length); // +1 for space
 	arguments[length] = '\0';
 	
@@ -57,6 +59,7 @@ void Terminal_execute_command(Terminal* self, char* line) {
 	printf("'%s' is not recognized as an internal or external command,\noperable program or batch file.\n", command);
 }
 
+// Path manipulations
 void Terminal_navigate(Terminal* self, char* path_name) {
 	char* path_token = strtok(path_name, "/");
 	if(path_token == NULL) {
@@ -87,4 +90,8 @@ void Terminal_navigate_folder(Terminal* self, char* path_name) {
 		path->previous = self->last_path;
 		self->last_path = path;
 	}
+}
+
+char* Terminal_get_path(Terminal* self) {
+	return Path_to_string(self->first_path);
 }
