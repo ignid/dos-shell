@@ -1,18 +1,15 @@
-#ifdef _WIN32
-#elif defined __linux__
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
-#endif
 
 void dir_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
-	#ifdef _WIN32
-	#elif defined __linux__
-	printf(" Volume in drive ? is ?\n");
+	//struct stat dir_stat;
+	//stat(Terminal_get_path(terminal), &dir_stat);
+	printf(" Volume in drive %s is ?\n", );
 	printf(" Volume Serial Number is ?\n");
 	printf("\n");
-	printf(" Directory of F:\\\n");
+	printf(" Directory of %s\n", Terminal_get_path(terminal));
 	
 	DIR* dir = opendir(Terminal_get_path(terminal));
 	struct dirent* dp;
@@ -59,5 +56,4 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	//     5,623,325
 	printf("%s File(s) %s bytes\n", left_space(itoa(files), 16), left_space(itoa(total_size), 14));
 	printf("%s  Dir(s) %s bytes free\n", left_space(itoa(directories), 16), left_space(ltoa(free_size), 14));
-	#endif
 }

@@ -1,3 +1,7 @@
 void cd_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
-	Terminal_navigate(terminal, arguments);
+	if(strlen(arguments) == 0) {
+		printf("%s\n", Path_to_string(terminal->first_path));
+	} else {
+		Terminal_navigate(terminal, arguments);
+	}
 }

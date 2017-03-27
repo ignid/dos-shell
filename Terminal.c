@@ -1,14 +1,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include "Terminal.h"
 #define INITIAL_COMMANDS 10
-
-#ifdef _WIN32
-#define DEFAULT_PATH_NAME "C:\\"
-#elif defined __linux__
 #define DEFAULT_PATH_NAME "/"
-#endif
 
 Terminal* Terminal_create() {
 	Terminal* terminal = (Terminal*)malloc(sizeof(Terminal));
@@ -23,6 +20,7 @@ Terminal* Terminal_create() {
 	return terminal;
 }
 
+// Command calls
 int Terminal_add_command(Terminal* self, Command* command) {
 	if(self->length == self->capacity) {
 		void* tmp_commands = realloc(self->commands, (self->length + 1)*sizeof(Command*));
@@ -40,9 +38,10 @@ int Terminal_add_command(Terminal* self, Command* command) {
 }
 
 void Terminal_execute_command(Terminal* self, char* line) {
+	if(strcmp(line, "") == 0) return;
+	strtrim(line);
 	char* running = strdup(line);
 	char* command = strsep(&running, " ");
-	if(strcmp(command, "") == 0) return;
 	
 	size_t length = strlen(line) - strlen(command);
 	char* arguments = malloc(length);
@@ -73,7 +72,9 @@ void Terminal_navigate(Terminal* self, char* path_name) {
 }
 
 void Terminal_navigate_folder(Terminal* self, char* path_name) {
-	if(strcmp(path_name, "..") == 0) {
+	if (strlen(path_name) == 0 || strcmp(path_name, ".") == 0) {
+		return;
+	} else if(strcmp(path_name, "..") == 0) {
 		Path* previous = self->last_path->previous;
 		Path* current = self->last_path;
 		if(previous == NULL) {
@@ -82,13 +83,30 @@ void Terminal_navigate_folder(Terminal* self, char* path_name) {
 		self->last_path = previous;
 		self->last_path->next = NULL;
 		free(current);
-	} else if (strcmp(path_name, ".") == 0) {
-		return;
 	} else {
 		Path* path = Path_create(path_name);
-		self->last_path->next = path;
-		path->previous = self->last_path;
-		self->last_path = path;
+		
+		char* last_path_string = Terminal_get_path(self);
+		char path_string[strlen(last_path_string) + strlen(path->name)];
+		strcpy(path_string, last_path_string);
+		strcat(path_string, path->name);
+		
+		struct stat fs_stat;
+		if(stat(path_string, &fs_stat) == -1) {
+			if(errno == 2) {
+				printf("The system cannot find the path specified.\n");
+			} else {
+				printf("ERRNO %i\n", errno);
+			}
+			free(path);
+		} else if(S_ISREG(fs_stat.st_mode)) {
+			printf("The directory name is invalid.\n");
+			free(path);
+		} else {
+			self->last_path->next = path;
+			path->previous = self->last_path;
+			self->last_path = path;
+		}
 	}
 }
 

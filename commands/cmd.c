@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#ifdef _WIN32
-#elif defined __linux__
 #include <sys/utsname.h>
-#endif
 
 void cmd_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	#ifdef _WIN32

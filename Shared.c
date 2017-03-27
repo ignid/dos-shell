@@ -14,6 +14,18 @@ char* left_space (char* string, size_t max) {
 	return spaced;
 }
 
+// STRING TRIM COURTESY OF jkramer
+// https://stackoverflow.com/a/123724
+void strtrim(char* string) {
+	char * p = string;
+	int l = strlen(p);
+
+	while(isspace(p[l - 1])) p[--l] = 0;
+	while(* p && isspace(* p)) ++p, --l;
+
+	memmove(string, p, l + 1);
+}
+
 // NUMBER TO STRING FUNCTIONS
 char* itoa(int i) {
 	size_t length = snprintf( NULL, 0, "%d", i );
