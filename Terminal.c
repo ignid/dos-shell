@@ -25,7 +25,7 @@ int Terminal_add_command(Terminal* self, Command* command) {
 	if(self->length == self->capacity) {
 		void* tmp_commands = realloc(self->commands, (self->length + 1)*sizeof(Command*));
 		if(tmp_commands == NULL) {
-			printf("REALLOC COMMANDS FAILED! SAD!");
+			printw("REALLOC COMMANDS FAILED! SAD!");
 			return 0;
 		} else {
 			self->commands = tmp_commands;
@@ -55,7 +55,7 @@ void Terminal_execute_command(Terminal* self, char* line) {
 			return;
 		}
 	}
-	printf("'%s' is not recognized as an internal or external command,\noperable program or batch file.\n", command);
+	printw("'%s' is not recognized as an internal or external command,\noperable program or batch file.\n", command);
 }
 
 // Path manipulations
@@ -94,13 +94,13 @@ void Terminal_navigate_folder(Terminal* self, char* path_name) {
 		struct stat fs_stat;
 		if(stat(path_string, &fs_stat) == -1) {
 			if(errno == 2) {
-				printf("The system cannot find the path specified.\n");
+				printw("The system cannot find the path specified.\n");
 			} else {
-				printf("ERRNO %i\n", errno);
+				printw("ERRNO %i\n", errno);
 			}
 			free(path);
 		} else if(S_ISREG(fs_stat.st_mode)) {
-			printf("The directory name is invalid.\n");
+			printw("The directory name is invalid.\n");
 			free(path);
 		} else {
 			self->last_path->next = path;

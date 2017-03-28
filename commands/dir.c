@@ -6,10 +6,10 @@
 void dir_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	//struct stat dir_stat;
 	//stat(Terminal_get_path(terminal), &dir_stat);
-	printf(" Volume in drive %s is ?\n", );
-	printf(" Volume Serial Number is ?\n");
-	printf("\n");
-	printf(" Directory of %s\n", Terminal_get_path(terminal));
+	printw(" Volume in drive ? is ?\n");
+	printw(" Volume Serial Number is ?\n");
+	printw("\n");
+	printw(" Directory of %s\n\n", Terminal_get_path(terminal));
 	
 	DIR* dir = opendir(Terminal_get_path(terminal));
 	struct dirent* dp;
@@ -28,7 +28,7 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 			strcat(absolute_path, dp->d_name);
 			
 			if(stat(absolute_path, &file_stat) != 0) {
-				printf("ERROR!\n");
+				printw("ERROR!\n");
 				return;
 			}
 			
@@ -37,7 +37,7 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 			struct tm* tm_info = localtime(&timestamp);
 			
 			strftime(date, 18, "%d/%m/%Y  %I:%M", tm_info);
-			printf("%s %s %s\n", date, left_space(itoa(file_stat.st_size), 17), dp->d_name);
+			printw("%s  %8s %8d %s\n", date, S_ISREG(file_stat.st_mode) ? "<DIR> " : "" , file_stat.st_size, dp->d_name);
 			
 			if(S_ISREG(file_stat.st_mode)) {
 				files++;
@@ -54,6 +54,7 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	
 	//               7
 	//     5,623,325
-	printf("%s File(s) %s bytes\n", left_space(itoa(files), 16), left_space(itoa(total_size), 14));
-	printf("%s  Dir(s) %s bytes free\n", left_space(itoa(directories), 16), left_space(ltoa(free_size), 14));
+	
+	printw("%16d File(s) %16lu bytes\n", files, total_size);//, 14));
+	printw("%16d  Dir(s) %16lu bytes free\n", directories, free_size);//, 14));
 }
