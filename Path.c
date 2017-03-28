@@ -8,10 +8,6 @@ Path* Path_create(char* name) {
 	return path;
 }
 
-void Path_destroy(Path* self) {
-	free(self);
-}
-
 char* Path_to_string(Path* self) {
 	size_t length = strlen(self->name);
 	Path* current = self->next;

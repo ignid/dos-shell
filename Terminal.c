@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "Terminal.h"
-#define INITIAL_COMMANDS 10
+#define INITIAL_COMMANDS 20
 #define DEFAULT_PATH_NAME "/"
 
 Terminal* Terminal_create() {
@@ -38,8 +38,8 @@ int Terminal_add_command(Terminal* self, Command* command) {
 }
 
 void Terminal_execute_command(Terminal* self, char* line) {
-	if(strcmp(line, "") == 0) return;
 	strtrim(line);
+	if(strcmp(line, "") == 0) return;
 	char* running = strdup(line);
 	char* command = strsep(&running, " ");
 	
@@ -52,10 +52,13 @@ void Terminal_execute_command(Terminal* self, char* line) {
 	for(i = 0; i < self->length; i++){
 		if(strcmp(self->commands[i]->name, command) == 0) {
 			self->commands[i]->execute(self, self->commands[i], arguments);
+			free(arguments);
 			return;
 		}
 	}
+	
 	printw("'%s' is not recognized as an internal or external command,\noperable program or batch file.\n", command);
+	free(arguments);
 }
 
 // Path manipulations
@@ -85,31 +88,33 @@ void Terminal_navigate_folder(Terminal* self, char* path_name) {
 		free(current);
 	} else {
 		Path* path = Path_create(path_name);
-		
-		char* last_path_string = Terminal_get_path(self);
-		char path_string[strlen(last_path_string) + strlen(path->name)];
-		strcpy(path_string, last_path_string);
-		strcat(path_string, path->name);
+		char* path_string = concat(Terminal_get_path(self), path->name);
 		
 		struct stat fs_stat;
 		if(stat(path_string, &fs_stat) == -1) {
 			if(errno == 2) {
-				printw("The system cannot find the path specified.\n");
+				printw(NOT_EXISTS_ERR);
 			} else {
 				printw("ERRNO %i\n", errno);
 			}
 			free(path);
 		} else if(S_ISREG(fs_stat.st_mode)) {
-			printw("The directory name is invalid.\n");
+			printw(INVALID_DIR_NAME_ERR);
 			free(path);
 		} else {
 			self->last_path->next = path;
 			path->previous = self->last_path;
 			self->last_path = path;
 		}
+		
+		free(path_string);
 	}
 }
 
 char* Terminal_get_path(Terminal* self) {
 	return Path_to_string(self->first_path);
+}
+
+char* Terminal_get_subdir(Terminal* self, char* subdir) {
+	return concat(Terminal_get_path(self), subdir);
 }

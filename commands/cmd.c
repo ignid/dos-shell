@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <sys/utsname.h>
-
 void cmd_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	struct utsname os_stat;
 	uname(&os_stat);
@@ -9,18 +5,15 @@ void cmd_execute(struct Terminal* terminal, struct Command* self, char* argument
 	printw("GNU General Public License (version 3)\n");
 	refresh();
 	
-	char* line;
-	size_t length;
-	
+	char line[256];
 	while(1) {
-		line = calloc(1,1);
-		length = 0;
 		if(echo_status) {
-			printw("\n%s> ", Path_to_string(terminal->first_path));
+			char* path = Path_to_string(terminal->first_path);
+			printw("\n%s> ", path);
 			refresh();
+			free(path);
 		}
-		getstr(line);
+		getnstr(line, 256);
 		Terminal_execute_command(terminal, line);
-		free(line);
 	}
 }

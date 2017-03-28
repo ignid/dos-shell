@@ -1,8 +1,3 @@
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-
 void dir_execute(struct Terminal* terminal, struct Command* self, char* arguments) {
 	//struct stat dir_stat;
 	//stat(Terminal_get_path(terminal), &dir_stat);
@@ -23,12 +18,11 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	while((dp = readdir(dir)) != NULL) {
 		if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")) {
 		} else {
-			char absolute_path[strlen(dp->d_name) + strlen(Terminal_get_path(terminal))];
-			strcpy(absolute_path, Terminal_get_path(terminal));
-			strcat(absolute_path, dp->d_name);
+			char* absolute_path = concat(Terminal_get_path(terminal), dp->d_name);
 			
 			if(stat(absolute_path, &file_stat) != 0) {
-				printw("ERROR!\n");
+				printw("%s ERROR!\n", absolute_path);
+				free(absolute_path);
 				return;
 			}
 			
@@ -45,6 +39,8 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 				directories++;
 			}
 			total_size += file_stat.st_size;
+			
+			free(absolute_path);
 		}
 	}
 	
@@ -55,6 +51,6 @@ void dir_execute(struct Terminal* terminal, struct Command* self, char* argument
 	//               7
 	//     5,623,325
 	
-	printw("%16d File(s) %16lu bytes\n", files, total_size);//, 14));
-	printw("%16d  Dir(s) %16lu bytes free\n", directories, free_size);//, 14));
+	printw("%16d File(s) %16lu bytes\n", files, total_size);
+	printw("%16d  Dir(s) %16lu bytes free\n", directories, free_size);
 }

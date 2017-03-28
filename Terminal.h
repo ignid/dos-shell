@@ -21,3 +21,4 @@ void Terminal_execute_command(Terminal* self, char* name);
 void Terminal_navigate(Terminal* self, char* path_name);
 void Terminal_navigate_folder(Terminal* self, char* path_name);
 inline char* Terminal_get_path(Terminal* self);
+inline char* Terminal_get_subdir(Terminal* self, char* subdir);

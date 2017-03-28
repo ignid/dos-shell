@@ -11,3 +11,10 @@ void strtrim(char* string) {
 
 	memmove(string, p, l + 1);
 }
+
+char* concat(char* s1, char* s2) {
+	char* new = malloc(strlen(s1) + strlen(s2) + 1);
+	strcpy(new, s1);
+	strcat(new, s2);
+	return new;
+}

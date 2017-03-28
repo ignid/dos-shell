@@ -1,4 +1,6 @@
-extern void strtrim(char* string);
-extern int echo_status;
-extern char* path_name;
-extern char* actual_path_name;
+void strtrim(char* string);
+inline char* concat;
+
+int echo_status;
+char* path_name;
+char* actual_path_name;
